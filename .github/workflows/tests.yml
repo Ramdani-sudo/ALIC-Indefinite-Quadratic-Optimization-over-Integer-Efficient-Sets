@@ -23,3 +23,5 @@ jobs:
         run: python -m pytest -q
       - name: Run reference example
         run: python examples/reference_example.py
+      - name: Verify all 1440 archived instances and hashes
+        run: python tools/verify_full_repository.py
