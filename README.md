@@ -1,6 +1,6 @@
 # ALIC Revised vs Prerna--Sharma 2024 Reconstruction
 
-This repository contains the Python implementation, exact deterministic instance generator, benchmark protocol, reproducibility documentation, and archived result summaries used for the computational study comparing **ALIC Revised** with a Python reconstruction of **Prerna--Sharma (2024)**. The full binary instance set can be regenerated exactly from the published seed rule and generator.
+This repository contains the Python implementation, exact deterministic instance generator, the **1440 binary benchmark instances used in the final study**, benchmark protocols, archived raw results, paired checks, and reproducibility documentation for the computational comparison of **ALIC Revised** with a Python reconstruction of **Prerna--Sharma (2024)**.
 
 ## Authors and affiliations
 
@@ -101,15 +101,16 @@ For agreement between exact methods, the primary criterion is equality of the ce
 
 ## Recovery verification
 
-The recovered generator was validated locally against the SHA-256 values of all 1440 accepted instances from the archived final campaign. The GitHub repository keeps the deterministic generator and protocol; users can regenerate the full NPZ instance set locally.
+The repository contains the exact 1440 accepted NPZ instance files used by the final campaign. Their canonical SHA-256 values are recorded in the manifest and cross-checked against the archived result file. The deterministic generator can also regenerate the complete set from scratch.
 
-Run the automated tests with:
+Run the automated tests and full data-integrity verification with:
 
 ```bash
 python -m pytest -q
+python tools/verify_full_repository.py
 ```
 
-See `VERIFICATION_REPORT.md` for the recorded 1440-instance hash-recovery evidence and final-campaign checks.
+See `VERIFICATION_REPORT.md` for the recorded recovery evidence and final-campaign checks.
 
 ## Rerunning without overwriting the archived results
 
