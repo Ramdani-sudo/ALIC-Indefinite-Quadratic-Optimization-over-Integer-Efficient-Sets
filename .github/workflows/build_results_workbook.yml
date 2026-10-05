@@ -1,0 +1,48 @@
+name: Build archived results workbook
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build_results_workbook.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build workbook from archived CSV files
+        run: |
+          PYTHONPATH=src python - <<'PY'
+          from oqpes.reporting import write_excel
+          write_excel(
+              "results/extended_1440_300s/results.csv",
+              "results/extended_1440_300s/pair_checks.csv",
+              "results/extended_1440_300s/results.xlsx",
+          )
+          PY
+      - name: Commit workbook
+        run: |
+          git config user.name "Ramdani Zoubir"
+          git config user.email "z.ramdani@univ-bba.dz"
+          git add results/extended_1440_300s/results.xlsx
+          if git diff --cached --quiet; then
+            echo "No workbook changes to commit."
+          else
+            git commit -m "data: add archived final results workbook"
+            git push
+          fi
