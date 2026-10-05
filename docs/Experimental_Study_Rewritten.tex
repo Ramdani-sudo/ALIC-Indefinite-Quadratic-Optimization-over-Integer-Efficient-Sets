@@ -1,0 +1,202 @@
+\section{Computational study}
+\label{sec:computational}
+
+This section compares ALIC with the exact method of Prerna and
+Sharma~\cite{prernaSharma2024}. The aim is to evaluate two complementary
+aspects of the algorithms: the time required to certify an optimal efficient
+solution and the number of optimization subproblems solved before
+termination. Solution agreement is checked first, because both procedures
+are exact.
+
+The experiments were implemented in Python~3 in an Anaconda environment
+and executed on a Windows workstation equipped with an 11th-generation
+Intel Core i7 processor and 16~GB of RAM. All linear integer and
+mixed-integer linear models were submitted through
+\texttt{scipy.optimize.milp}, which uses the HiGHS optimization
+backend~\cite{virtanen2020scipy,huangfuHall2018}. In ALIC, the exact
+linearized master problem and the non-affine secondary completion are
+MILPs. The primary completion/efficiency problem and the affine secondary
+completion are linear integer models solved through the same interface.
+For the Prerna--Sharma reconstruction, the same solver interface was used
+for the preprocessing ILPs, the ranked linear problems, the tied-level
+enumeration problems, and the efficiency tests. Using one solver backend
+for both methods avoids a solver-dependent advantage.
+
+The comparison follows a paired design. Each generated instance is solved
+once by ALIC and once by Prerna--Sharma, and the execution order is
+alternated from one instance to the next. The wall-clock time includes the
+method-specific preprocessing. Internal LP relaxations performed by HiGHS
+are not counted as separate subproblems. The source code, deterministic
+instance generator and manifests, and archived result data are available at
+\url{https://github.com/Ramdani-sudo/ALIC-Indefinite-Quadratic-Optimization-over-Integer-Efficient-Sets}.
+
+\subsection{Benchmark generation and experimental protocol}
+\label{subsec:benchmark-protocol}
+
+The random generator follows the coefficient ranges used by Prerna and
+Sharma~\cite{prernaSharma2024}. For every raw draw, the entries of the
+constraint matrix are sampled from $\{0,\ldots,20\}$ and the right-hand side
+from $\{0,\ldots,100\}$. The coefficients of the objective matrix and of
+the quadratic preference are sampled from
+$\{-100,\ldots,100\}$. The quadratic matrix is generated symmetrically and
+is required to be strictly indefinite. The lower bounds are zero.
+
+Because the constraint coefficients and the right-hand side are
+nonnegative, finite integer upper bounds are obtained without solving
+additional optimization problems:
+\[
+ u_j=\min_{i:A_{ij}>0}\left\lfloor\frac{b_i}{A_{ij}}\right\rfloor .
+\]
+This bound computation is part of instance construction and is identical
+for both methods.
+
+A direct use of the original random ranges produced many uninformative
+draws. In particular, some instances had no nonzero unit feasible point,
+and the quadratic preference could be constant on a simple probe set. We
+therefore used a complete draw-and-reject procedure. A raw draw was kept
+only when at least one nonzero unit vector was feasible, the preference was
+nonconstant on the probe set formed by the origin and the feasible unit
+vectors, and the quadratic matrix was strictly indefinite. The accepted
+instance was never modified after generation. In total, 7614 raw draws
+were rejected before the final benchmark set was obtained. These
+restrictions remove obvious trivialities while preserving the coefficient
+ranges of the Prerna--Sharma protocol.
+
+The benchmark grid is
+\[
+ p\in\{5,10,20,50\},\qquad
+ n\in\{10,20,50\},\qquad
+ m\in\{10,20,30,50\},
+\]
+where $p$ denotes the number of criteria in the experimental generator.
+There are $4\times3\times4=48$ configurations. Each configuration is
+repeated 30 times, giving 1440 paired instances and 2880 method runs. A
+time limit of 300~s is imposed on each method for each instance. A run is
+declared optimal only when the solver certificate required by the
+corresponding algorithm is available.
+
+\subsection{Statistical methodology}
+\label{subsec:statistics}
+
+The observations are paired because both methods solve exactly the same
+instances. Following modern recommendations for optimization
+benchmarks~\cite{carrasco2020,bartzBeielstein2020}, the analysis combines
+descriptive statistics, nonparametric inference, effect sizes, and a
+Bayesian practical comparison.
+
+For wall-clock time and solver calls, the main frequentist comparison is
+the two-sided Wilcoxon signed-rank test~\cite{wilcoxon1945}. The
+rank-biserial correlation is reported as an effect size. Because runtime
+ratios are skewed, the Wilcoxon analysis is complemented by a paired
+sign-permutation test on
+$\log(T_{\mathrm{P}}/T_{\mathrm{A}})$~\cite{pesarin2001}. Bootstrap
+95\% confidence intervals are used for the median speedup.
+
+The 48 configuration-wise runtime tests form one family. Their $p$-values
+are therefore adjusted with Holm's sequential procedure~\cite{holm1979}.
+Optimal-solve success is compared with the exact McNemar test. In
+addition, a Bayesian signed-rank comparison based on a Dirichlet process
+is used~\cite{benavoli2014}. The practical-equivalence region is set to
+$\pm10\%$ in relative runtime. Finally, a Dolan--Mor\'e performance
+profile is used as a solver-oriented graphical summary~\cite{dolanMore2002}.
+
+\subsection{Results and discussion}
+\label{subsec:results-discussion}
+
+The two methods reached certified optimality together on 1421 instances.
+Their optimal objective values agree on all 1421 cases. The decision
+vectors are identical in 1419 cases. In the remaining two cases, different
+efficient decisions attain the same optimal quadratic value. Thus, no
+instance produced two different certified optimal objective values.
+
+ALIC solved 1438 of the 1440 instances, whereas the Prerna--Sharma
+reconstruction solved 1421. ALIC was the only method to certify optimality
+on 17 instances; the reverse case did not occur. The exact McNemar test
+gives $p=1.53\times10^{-5}$.
+
+\begin{table}[t]
+\centering
+\caption{Overall comparison on the complete benchmark. Runtime summaries
+for the first four rows use the 1421 instances solved optimally by both
+methods.}
+\label{tab:overall-results}
+\small
+\begin{tabular}{lrr}
+\toprule
+Measure & ALIC & Prerna--Sharma\\
+\midrule
+Optimal solves (out of 1440) & 1438 & 1421\\
+Median runtime (s) & 0.433 & 0.168\\
+Mean runtime (s) & 1.314 & 2.969\\
+Maximum common-optimal runtime (s) & 99.493 & 283.294\\
+PAR-2 mean runtime (s) & 2.587 & 10.846\\
+Median solver calls & 2 & 25\\
+Mean solver calls & 2.118 & 44.975\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The main structural difference appears in the number of subproblems.
+Across the 1421 common optimal solves, the median is 2 calls for ALIC and
+25 for Prerna--Sharma. The median ratio
+$N_{\mathrm{P}}/N_{\mathrm{A}}$ is 12.5. ALIC uses fewer optimization
+subproblems on every common optimal pair. The Wilcoxon test gives
+$p=1.49\times10^{-234}$ with rank-biserial correlation equal to 1.
+
+The global paired runtime comparison favors Prerna--Sharma for the typical
+common-optimal instance: the Wilcoxon test gives
+$p=4.39\times10^{-78}$ and a rank-biserial effect of $-0.573$ when a
+positive sign is defined in favor of ALIC. The median speedup
+$T_{\mathrm{P}}/T_{\mathrm{A}}$ is 0.237, with a 95\% bootstrap interval
+of approximately $[0.221,0.256]$.
+
+The mean runtime tells a different part of the story. It is 1.314~s for
+ALIC and 2.969~s for Prerna--Sharma. The PAR-2 mean is also much smaller
+for ALIC. These measures include the difficult tail and the timeout
+penalty, and therefore show that ALIC is more robust on the hardest
+instances even though it is not the fastest method on the median
+common-optimal run.
+
+The configuration-level analysis is also informative. After Holm
+correction of the 48 paired Wilcoxon tests, 31 configurations
+significantly favor Prerna--Sharma in median runtime, 4 significantly
+favor ALIC, and 13 show no significant difference. The four significant
+ALIC wins all occur for $n=50$ and $m=50$, for
+$p\in\{5,10,20,50\}$. Their median speedups are between 6.52 and 7.03.
+This crossover is consistent with the purpose of ALIC: its larger master
+models can be costly on easy instances, but the strong reduction in the
+number of repeated subproblems becomes valuable on difficult instances.
+
+\subsection{Limitations and interpretation of the computational cost}
+
+The experiments show that fewer optimization subproblems do not
+necessarily imply a lower wall-clock time. ALIC solves substantially
+fewer subproblems than the Prerna--Sharma method, but its main subproblem
+is an exact master MILP containing the binary expansion variables,
+auxiliary product variables, and the accumulated image-cut variables.
+This master can therefore be more expensive than the smaller ILPs solved
+by the reference method.
+
+The primary completion of ALIC is lighter, since it is an ILP used to
+test efficiency and to obtain an efficient dominating solution when
+needed. A secondary problem is solved only when uniqueness is not
+certified, and it is either an ILP or an exact MILP depending on the
+restricted quadratic structure. In contrast, the Prerna--Sharma method
+solves a larger sequence of ranking, tied-level enumeration, and
+efficiency-test problems. Hence, its number of solver calls is much
+larger, but many of these calls are small.
+
+This explains the observed results. On the 1421 common optimal instances,
+the median number of solver calls is 2 for ALIC and 25 for
+Prerna--Sharma, while the median runtime is 0.433~s and 0.168~s,
+respectively. Thus, Prerna--Sharma is often faster on easy instances.
+However, ALIC performs better on the difficult tail: its mean runtime is
+1.314~s versus 2.969~s, and its PAR-2 score is 2.587~s versus 10.846~s.
+The main practical advantage of ALIC is therefore a much smaller number of
+optimization subproblems and better robustness on difficult instances,
+rather than a uniform runtime advantage.
+
+Finally, the benchmark is synthetic and follows the Prerna--Sharma
+generation ranges, with additional rejection rules used to remove obvious
+trivial cases. The conclusions should therefore be restricted to the
+tested setting.
