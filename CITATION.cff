@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, benchmark, or data, please cite the associated article."
+title: "ALIC: Indefinite Quadratic Optimization over Integer Efficient Sets"
+type: software
+authors:
+  - family-names: Ramdani
+    given-names: Zoubir
+    email: z.ramdani@univ-bba.dz
+    orcid: "https://orcid.org/0000-0002-4761-8057"
+  - family-names: Brahmi
+    given-names: Boualem
+    email: b.brahmi@univ-bba.dz
+    orcid: "https://orcid.org/0000-0002-0486-2682"
+  - family-names: Younsi Abbaci
+    given-names: Leila
+    email: leila.abbaci@univ-bejaia.dz
+  - family-names: Iftissen
+    given-names: El-Ghani
+    email: e.iftissen@univ-bouira.dz
+repository-code: "https://github.com/Ramdani-sudo/ALIC-Indefinite-Quadratic-Optimization-over-Integer-Efficient-Sets"
