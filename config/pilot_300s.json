@@ -1,0 +1,13 @@
+{
+  "name": "pilot_300s",
+  "grid": {"p": [5], "n": [10], "m": [10], "replications": 3},
+  "generation": {"mode": "paper_range_complete_draw_rejection", "min_unit_points": 1, "max_attempts": 50000, "overwrite": false},
+  "instances_dir": "instances/pilot_300s",
+  "results_dir": "results/pilot_300s",
+  "results_csv": "results.csv",
+  "pair_csv": "pair_checks.csv",
+  "excel_file": "results.xlsx",
+  "time_limit_seconds": 300,
+  "resume": true,
+  "alic": {"linearization_mode": "auto", "max_aggregate_dimension": 80}
+}
