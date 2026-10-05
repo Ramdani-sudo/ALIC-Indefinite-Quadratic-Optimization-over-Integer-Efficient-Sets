@@ -1,6 +1,6 @@
 # ALIC Revised vs Prerna--Sharma 2024 Reconstruction
 
-This repository contains the Python code, instance generator, benchmark protocol, generated instances, and archived results used for the computational study comparing **ALIC Revised** with a Python reconstruction of **Prerna--Sharma (2024)**.
+This repository contains the Python implementation, exact deterministic instance generator, benchmark protocol, reproducibility documentation, and archived result summaries used for the computational study comparing **ALIC Revised** with a Python reconstruction of **Prerna--Sharma (2024)**. The full binary instance set can be regenerated exactly from the published seed rule and generator.
 
 ## Authors and affiliations
 
@@ -101,19 +101,19 @@ For agreement between exact methods, the primary criterion is equality of the ce
 
 ## Recovery verification
 
-This recovered repository contains the exact 1440 accepted instance files used by the archived final campaign. `tools/verify_recovered_campaign.py` recomputes the canonical hash of every NPZ file and compares it with the hash stored in the final result CSV.
+The recovered generator was validated locally against the SHA-256 values of all 1440 accepted instances from the archived final campaign. The GitHub repository keeps the deterministic generator and protocol; users can regenerate the full NPZ instance set locally.
 
-Run:
+Run the automated tests with:
 
 ```bash
-python tools/verify_recovered_campaign.py
+python -m pytest -q
 ```
 
-A correct recovery reports zero missing instances, zero extra instances, zero manifest mismatches, and zero NPZ-content mismatches. See `VERIFICATION_REPORT.md` for the recorded recovery evidence and result-file checksums.
+See `VERIFICATION_REPORT.md` for the recorded 1440-instance hash-recovery evidence and final-campaign checks.
 
 ## Rerunning without overwriting the archived results
 
-The final article results are preserved under `results/extended_1440_300s/`. To perform a new full experiment without changing those archived files, use:
+To perform a new full experiment in a separate result directory, use:
 
 ```text
 RUN_EXTENDED_1440_300S_RERUN.bat
