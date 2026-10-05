@@ -30,7 +30,7 @@ def test_paper_config_has_480_instances_and_300_seconds():
 def test_launchers_reference_existing_config_paths():
     for bat, cfg in [
         ('RUN_PILOT_300S.bat','config/pilot_300s.json'),
-        ('RUN_PAPER_PROTOCOL_480_300S.bat','config/paper_protocol_480_300S.json'),
+        ('RUN_PAPER_PROTOCOL_480_300S.bat','config/paper_protocol_480_300s.json'),
         ('RUN_EXTENDED_1440_300S.bat','config/extended_1440_300s.json'),
     ]:
         text=(ROOT/bat).read_text(encoding='utf-8')
