@@ -1,0 +1,46 @@
+name: Materialize benchmark instances
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/materialize_instances.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate the exact 1440-instance campaign
+        run: |
+          python run.py generate --config config/extended_1440_300s.json --root .
+          python tools/verify_recovered_campaign.py
+
+      - name: Commit generated binary instances
+        run: |
+          git config user.name "Ramdani Zoubir"
+          git config user.email "z.ramdani@univ-bba.dz"
+          git add instances/extended_1440
+          if git diff --cached --quiet; then
+            echo "No generated-instance changes to commit."
+          else
+            git commit -m "data: materialize exact 1440 benchmark instances"
+            git push
+          fi
