@@ -1,0 +1,13 @@
+{
+  "name": "paper_protocol_480_300s",
+  "grid": {"p": [5, 10, 20, 50], "n": [10, 20, 50], "m": [10, 20, 30, 50], "replications": 10},
+  "generation": {"mode": "paper_range_complete_draw_rejection", "min_unit_points": 1, "max_attempts": 50000, "overwrite": false},
+  "instances_dir": "instances/paper_protocol_480",
+  "results_dir": "results/paper_protocol_480_300s",
+  "results_csv": "results.csv",
+  "pair_csv": "pair_checks.csv",
+  "excel_file": "results.xlsx",
+  "time_limit_seconds": 300,
+  "resume": true,
+  "alic": {"linearization_mode": "auto", "max_aggregate_dimension": 80}
+}
